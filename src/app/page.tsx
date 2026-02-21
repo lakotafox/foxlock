@@ -108,7 +108,7 @@ export default function Home() {
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     placeholder="yourbusiness.com"
-                    className="flex-1 bg-transparent px-5 py-4 text-white placeholder-ghost/40 focus:outline-none"
+                    className="flex-1 bg-transparent px-5 py-4 text-white placeholder-steel/60 focus:outline-none"
                     disabled={loading}
                   />
                   <button
@@ -131,7 +131,7 @@ export default function Home() {
                 </div>
                 {error && <p className="mt-3 text-red-400 text-sm">{error}</p>}
               </form>
-              <p className="text-ghost/50 text-xs mt-3">
+              <p className="text-steel text-xs mt-3">
                 Passive reconnaissance only. No intrusive testing without written authorization.
               </p>
             </div>
