@@ -102,7 +102,7 @@ function ScoreGauge({ score, riskLevel }: { score: number; riskLevel: string }) 
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`text-5xl font-display italic ${textColor}`}>{score}</span>
+          <span className={`text-5xl font-bold ${textColor}`}>{score}</span>
           <span className="text-xs text-ghost">/100</span>
         </div>
       </div>
@@ -145,7 +145,7 @@ export default function Results() {
       <nav className="relative z-50 border-b border-white/5">
         <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
           <a href="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-sm bg-amber/10 border border-amber/30 flex items-center justify-center text-amber font-display text-lg italic">
+            <div className="w-8 h-8 rounded-sm bg-amber/10 border border-amber/30 flex items-center justify-center text-amber font-bold text-lg">
               F
             </div>
             <span className="text-lg tracking-tight font-semibold">
@@ -161,8 +161,8 @@ export default function Results() {
       <main className="max-w-5xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-12 reveal">
-          <p className="text-amber font-display italic text-lg mb-2">Surface Scan Report</p>
-          <h1 className="font-display text-3xl text-ice mb-2">{result.url.replace(/^https?:\/\//, '')}</h1>
+          <p className="text-amber font-bold text-lg mb-2">Surface Scan Report</p>
+          <h1 className="font-bold text-3xl text-ice mb-2">{result.url.replace(/^https?:\/\//, '')}</h1>
           <p className="text-ghost text-sm">
             Scanned {new Date(result.timestamp).toLocaleString()}
           </p>
@@ -172,7 +172,7 @@ export default function Results() {
         <div className="grid md:grid-cols-[220px_1fr] gap-10 mb-14 p-8 rounded-xl border border-white/5 bg-obsidian reveal reveal-d1">
           <ScoreGauge score={result.score} riskLevel={result.riskLevel} />
           <div className="flex flex-col justify-center">
-            <p className="text-ice text-lg leading-relaxed font-display italic">
+            <p className="text-ice text-lg leading-relaxed font-bold">
               {result.summary}
             </p>
           </div>
@@ -195,7 +195,7 @@ export default function Results() {
             { label: "Findings", value: String(result.findings.length), ok: result.findings.length <= 2 },
           ].map((s, i) => (
             <div key={i} className="p-5 rounded-xl border border-white/5 bg-obsidian text-center">
-              <div className={`text-2xl font-display italic ${s.ok ? "text-green-400" : s.ok === false ? "text-red-400" : "text-ice"}`}>
+              <div className={`text-2xl font-bold ${s.ok ? "text-green-400" : s.ok === false ? "text-red-400" : "text-ice"}`}>
                 {s.value}
               </div>
               <div className="text-xs text-ghost mt-1 uppercase tracking-wider">{s.label}</div>
@@ -206,7 +206,7 @@ export default function Results() {
         {/* SSL */}
         {result.ssl && (
           <section className="mb-10 reveal reveal-d3">
-            <h2 className="font-display text-xl text-ice mb-4">SSL Certificate</h2>
+            <h2 className="font-bold text-xl text-ice mb-4">SSL Certificate</h2>
             <div className="p-6 rounded-xl border border-white/5 bg-obsidian">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
                 <div>
@@ -236,7 +236,7 @@ export default function Results() {
 
         {/* Headers */}
         <section className="mb-10 reveal reveal-d4">
-          <h2 className="font-display text-xl text-ice mb-4">Security Headers</h2>
+          <h2 className="font-bold text-xl text-ice mb-4">Security Headers</h2>
           <div className="space-y-2">
             {result.headers.map((h, i) => (
               <div key={i} className="p-4 rounded-lg border border-white/5 bg-obsidian flex items-center justify-between">
@@ -262,7 +262,7 @@ export default function Results() {
         {/* Tech */}
         {(result.tech.server || result.tech.cms || result.tech.framework) && (
           <section className="mb-10 reveal reveal-d5">
-            <h2 className="font-display text-xl text-ice mb-4">Detected Technology</h2>
+            <h2 className="font-bold text-xl text-ice mb-4">Detected Technology</h2>
             <div className="p-6 rounded-xl border border-white/5 bg-obsidian">
               <div className="flex flex-wrap gap-2">
                 {result.tech.server && (
@@ -297,7 +297,7 @@ export default function Results() {
 
         {/* Findings */}
         <section className="mb-10 reveal reveal-d6">
-          <h2 className="font-display text-xl text-ice mb-4">Findings</h2>
+          <h2 className="font-bold text-xl text-ice mb-4">Findings</h2>
 
           <div className="space-y-3">
             {freeFindings.map((f, i) => (
@@ -335,7 +335,7 @@ export default function Results() {
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="bg-obsidian border border-amber/20 rounded-xl p-8 text-center max-w-md glow-amber">
-                    <p className="font-display italic text-2xl text-ice mb-2">
+                    <p className="font-bold text-2xl text-ice mb-2">
                       {lockedFindings.length} more finding{lockedFindings.length !== 1 ? "s" : ""}
                     </p>
                     <p className="text-steel text-sm mb-6">
@@ -359,7 +359,7 @@ export default function Results() {
 
         {/* Upsell */}
         <section className="mb-12 p-10 rounded-xl border border-amber/15 bg-amber/3 text-center">
-          <p className="font-display italic text-2xl text-ice mb-4">
+          <p className="font-bold text-2xl text-ice mb-4">
             This scan checked the surface.
           </p>
           <p className="text-steel mb-8 max-w-lg mx-auto">

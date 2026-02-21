@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const NetworkCanvas = dynamic(() => import("@/components/NetworkCanvas"), {
+  ssr: false,
+});
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -40,29 +45,29 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-void">
-      {/* Ambient glow */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-amber/5 rounded-full blur-[120px] pointer-events-none" />
-
       {/* Nav */}
-      <nav className="relative z-50 border-b border-white/5">
-        <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-sm bg-amber/10 border border-amber/30 flex items-center justify-center text-amber font-display text-lg italic group-hover:bg-amber/20 transition">
-              F
+      <nav className="relative z-50 border-b border-white/5 backdrop-blur-md bg-void/70">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <a href="/" className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded bg-amber/15 border border-amber/30 flex items-center justify-center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-amber-light">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
             </div>
-            <span className="text-lg tracking-tight font-body font-semibold">
+            <span className="text-lg font-bold tracking-tight">
               Fox<span className="text-amber-light">Lock</span>
             </span>
           </a>
-          <div className="flex items-center gap-8 text-sm">
-            <a href="#services" className="text-ghost hover:text-ice transition">Services</a>
-            <a href="#process" className="text-ghost hover:text-ice transition">Process</a>
-            <a href="#pricing" className="text-ghost hover:text-ice transition">Pricing</a>
+          <div className="hidden md:flex items-center gap-8 text-sm">
+            <a href="#services" className="text-steel hover:text-white transition">Services</a>
+            <a href="#how-it-works" className="text-steel hover:text-white transition">How It Works</a>
+            <a href="#pricing" className="text-steel hover:text-white transition">Pricing</a>
             <a
               href="mailto:contact@foxlock.dev"
-              className="px-4 py-2 border border-amber/30 text-amber-light hover:bg-amber/10 rounded transition text-sm"
+              className="px-4 py-2 bg-amber hover:bg-amber-light text-void font-semibold rounded-lg transition text-sm"
             >
-              Get in Touch
+              Contact
             </a>
           </div>
         </div>
@@ -70,267 +75,234 @@ export default function Home() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="max-w-5xl mx-auto px-6 pt-24 pb-20">
-          <div className="reveal">
-            <p className="text-amber font-display italic text-lg mb-6 tracking-wide">
-              Penetration Testing & Security Audits
-            </p>
-          </div>
-
-          <h1 className="font-display text-5xl md:text-7xl leading-[1.1] mb-8 reveal reveal-d1">
-            See your website
-            <br />
-            <span className="italic text-amber-light">the way an attacker does.</span>
-          </h1>
-
-          <p className="text-steel text-xl max-w-2xl mb-14 leading-relaxed reveal reveal-d2">
-            Real penetration testing powered by AI. Not a checkbox audit.
-            We probe your attack surface with the same tools threat actors use &mdash;
-            then explain everything in language you actually understand.
-          </p>
-
-          {/* Free Scan CTA */}
-          <div className="reveal reveal-d3">
-            <p className="text-ghost text-xs uppercase tracking-widest mb-3 font-semibold">
-              Free surface scan &mdash; 30 seconds
-            </p>
-            <form onSubmit={handleScan} className="max-w-xl">
-              <div className="flex gap-0 bg-obsidian border border-white/10 rounded-lg overflow-hidden focus-within:border-amber/40 transition glow-amber">
-                <input
-                  type="text"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="yourbusiness.com"
-                  className="flex-1 bg-transparent px-5 py-4 text-ice placeholder-ghost/50 focus:outline-none font-body"
-                  disabled={loading}
-                />
-                <button
-                  type="submit"
-                  disabled={loading || !url.trim()}
-                  className="px-8 py-4 bg-amber hover:bg-amber-light disabled:bg-ghost/20 disabled:text-ghost text-void font-semibold transition whitespace-nowrap"
-                >
-                  {loading ? (
-                    <span className="flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      Scanning
-                    </span>
-                  ) : (
-                    "Scan"
-                  )}
-                </button>
+        <section className="relative overflow-hidden">
+          <NetworkCanvas />
+          <div className="relative z-10 max-w-5xl mx-auto px-6 pt-28 pb-24">
+            <div className="fade-up">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber/8 border border-amber/15 text-amber-light text-xs font-medium mb-8">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-light animate-pulse" />
+                AI-Powered Penetration Testing
               </div>
-              {error && <p className="mt-3 text-red-400 text-sm">{error}</p>}
-            </form>
-            <p className="text-ghost/60 text-xs mt-3">
-              Passive reconnaissance only. No intrusive testing without authorization.
+            </div>
+
+            <h1 className="text-4xl md:text-6xl font-extrabold leading-[1.1] mb-6 fade-up fade-d1 tracking-tight">
+              See your website the way
+              <br />
+              <span className="text-amber-light">an attacker does.</span>
+            </h1>
+
+            <p className="text-lg text-steel max-w-xl mb-12 leading-relaxed fade-up fade-d2">
+              We use the same tools threat actors use to probe your attack surface.
+              Then we explain everything in language you actually understand.
             </p>
+
+            {/* Scan Input */}
+            <div className="fade-up fade-d3">
+              <p className="text-ghost text-xs uppercase tracking-widest mb-3 font-semibold">
+                Try a free surface scan
+              </p>
+              <form onSubmit={handleScan} className="max-w-lg">
+                <div className="flex bg-obsidian border border-white/10 rounded-xl overflow-hidden focus-within:border-amber/40 transition">
+                  <input
+                    type="text"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="yourbusiness.com"
+                    className="flex-1 bg-transparent px-5 py-4 text-white placeholder-ghost/40 focus:outline-none"
+                    disabled={loading}
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading || !url.trim()}
+                    className="px-8 py-4 bg-amber hover:bg-amber-light disabled:bg-white/5 disabled:text-ghost text-void font-bold rounded-r-xl transition whitespace-nowrap"
+                  >
+                    {loading ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Scanning
+                      </span>
+                    ) : (
+                      "Scan"
+                    )}
+                  </button>
+                </div>
+                {error && <p className="mt-3 text-red-400 text-sm">{error}</p>}
+              </form>
+              <p className="text-ghost/50 text-xs mt-3">
+                Passive reconnaissance only. No intrusive testing without written authorization.
+              </p>
+            </div>
           </div>
         </section>
 
-        <div className="gradient-line max-w-6xl mx-auto" />
+        <div className="gradient-line max-w-5xl mx-auto" />
 
         {/* Services */}
-        <section id="services" className="max-w-6xl mx-auto px-6 py-24">
-          <p className="text-amber font-display italic text-lg mb-3">What we do</p>
-          <h2 className="font-display text-3xl md:text-4xl mb-16">
-            Comprehensive security assessment,<br />
-            <span className="italic text-steel">delivered in plain English.</span>
-          </h2>
+        <section id="services" className="max-w-5xl mx-auto px-6 py-24">
+          <div className="mb-14">
+            <p className="text-amber text-xs uppercase tracking-widest font-semibold mb-3">Services</p>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+              Comprehensive security assessment.
+            </h2>
+          </div>
 
-          <div className="grid md:grid-cols-3 gap-px bg-white/5 rounded-xl overflow-hidden">
+          <div className="grid md:grid-cols-3 gap-4">
             {[
               {
+                num: "01",
                 title: "Attack Surface Mapping",
-                desc: "Subdomain enumeration, port scanning, service fingerprinting, technology detection. We map every entry point an attacker would find.",
-                tools: "amass, subfinder, nmap, httpx",
+                desc: "Subdomain enumeration, port scanning, service fingerprinting, technology detection. We find every entry point.",
+                tools: "amass  subfinder  nmap  httpx",
               },
               {
+                num: "02",
                 title: "Vulnerability Scanning",
-                desc: "Template-based CVE detection, web server misconfigurations, outdated software, known exploits across your entire infrastructure.",
-                tools: "nuclei, nikto, wafw00f",
+                desc: "CVE detection, web server misconfigurations, outdated software, known exploits across your infrastructure.",
+                tools: "nuclei  nikto  wafw00f",
               },
               {
+                num: "03",
                 title: "Active Testing",
-                desc: "Directory fuzzing, parameter testing, SQL injection probing, authentication analysis. Controlled offensive testing with your authorization.",
-                tools: "ffuf, gobuster, sqlmap, hydra",
+                desc: "Directory fuzzing, SQL injection probing, parameter testing, authentication analysis. Controlled offensive testing.",
+                tools: "ffuf  gobuster  sqlmap  hydra",
               },
             ].map((s, i) => (
-              <div key={i} className="bg-obsidian p-8 flex flex-col">
-                <div className="text-amber font-display italic text-4xl mb-6">
-                  {String(i + 1).padStart(2, "0")}
-                </div>
-                <h3 className="font-display text-xl mb-3 text-ice">{s.title}</h3>
-                <p className="text-steel text-sm leading-relaxed mb-6 flex-1">{s.desc}</p>
-                <p className="text-ghost text-xs font-mono">{s.tools}</p>
+              <div
+                key={i}
+                className="p-6 rounded-xl border border-white/5 bg-obsidian hover:border-amber/15 transition group"
+              >
+                <span className="text-amber/30 text-xs font-mono">{s.num}</span>
+                <h3 className="text-lg font-bold mt-3 mb-2 group-hover:text-amber-light transition">{s.title}</h3>
+                <p className="text-steel text-sm leading-relaxed mb-4">{s.desc}</p>
+                <p className="text-ghost/50 text-xs font-mono">{s.tools}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Toolkit */}
-        <section className="max-w-6xl mx-auto px-6 py-16">
-          <div className="bg-obsidian border border-white/5 rounded-xl p-10">
-            <p className="text-amber font-display italic text-lg mb-3">Our toolkit</p>
-            <h2 className="font-display text-2xl mb-8 text-ice">
-              11 professional-grade security tools,<br />
-              <span className="italic text-steel">orchestrated by AI.</span>
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {[
-                { name: "nmap", desc: "Port scanning" },
-                { name: "nuclei", desc: "CVE detection" },
-                { name: "nikto", desc: "Web vulnerabilities" },
-                { name: "sqlmap", desc: "SQL injection" },
-                { name: "ffuf", desc: "Web fuzzing" },
-                { name: "gobuster", desc: "Directory brute force" },
-                { name: "amass", desc: "Subdomain mapping" },
-                { name: "subfinder", desc: "Subdomain discovery" },
-                { name: "httpx", desc: "HTTP probing" },
-                { name: "hydra", desc: "Auth testing" },
-                { name: "wafw00f", desc: "WAF detection" },
-                { name: "AI Engine", desc: "Analysis & reporting" },
-              ].map((t, i) => (
-                <div
-                  key={i}
-                  className="px-4 py-3 rounded-lg border border-white/5 bg-void hover:border-amber/20 transition group"
+        {/* Toolkit Bar */}
+        <section className="max-w-5xl mx-auto px-6 pb-20">
+          <div className="p-6 rounded-xl border border-white/5 bg-obsidian">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-xs text-ghost uppercase tracking-widest font-semibold">Our Toolkit</p>
+              <p className="text-xs text-ghost">11 professional-grade tools</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {["nmap", "nuclei", "nikto", "sqlmap", "ffuf", "gobuster", "amass", "subfinder", "httpx", "hydra", "wafw00f"].map((t) => (
+                <span
+                  key={t}
+                  className="px-3 py-1.5 rounded-lg border border-white/5 bg-void text-sm font-mono text-steel hover:text-amber-light hover:border-amber/20 transition"
                 >
-                  <div className="font-mono text-sm text-ice group-hover:text-amber-light transition">
-                    {t.name}
-                  </div>
-                  <div className="text-ghost text-xs">{t.desc}</div>
-                </div>
+                  {t}
+                </span>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Process */}
-        <section id="process" className="max-w-5xl mx-auto px-6 py-24">
-          <p className="text-amber font-display italic text-lg mb-3">How it works</p>
-          <h2 className="font-display text-3xl md:text-4xl mb-16">
-            From scan to secure<br />
-            <span className="italic text-steel">in four steps.</span>
-          </h2>
+        {/* How It Works */}
+        <section id="how-it-works" className="max-w-5xl mx-auto px-6 py-20">
+          <div className="mb-14">
+            <p className="text-amber text-xs uppercase tracking-widest font-semibold mb-3">Process</p>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+              From scan to secure.
+            </h2>
+          </div>
 
-          <div className="space-y-0">
+          <div className="grid md:grid-cols-4 gap-6">
             {[
-              {
-                step: "01",
-                title: "Free Surface Scan",
-                desc: "Enter your URL above. In 30 seconds you get an automated check of your SSL, security headers, and public attack surface. No signup, no commitment.",
-              },
-              {
-                step: "02",
-                title: "Authorize & Engage",
-                desc: "Want the full picture? Sign our authorization form and choose your service tier. We never test without explicit written permission.",
-              },
-              {
-                step: "03",
-                title: "AI-Powered Pentest",
-                desc: "Our AI engine orchestrates 11 professional tools against your target. Port scanning, vulnerability detection, directory fuzzing, injection testing — the full methodology.",
-              },
-              {
-                step: "04",
-                title: "Report & Remediate",
-                desc: "Receive a comprehensive report in plain English. Every finding includes severity, business impact, and step-by-step fix instructions. No jargon, no scare tactics.",
-              },
+              { num: "1", title: "Free Scan", desc: "Enter your URL. Get an instant surface-level security check. No signup." },
+              { num: "2", title: "Authorize", desc: "Sign our authorization form and choose your service tier. We never test without permission." },
+              { num: "3", title: "Deep Scan", desc: "Our AI engine runs 11 tools against your target. Port scanning, vulnerability detection, fuzzing, injection testing." },
+              { num: "4", title: "Report", desc: "Get a comprehensive report in plain English. Every finding includes severity, business impact, and how to fix it." },
             ].map((p, i) => (
-              <div
-                key={i}
-                className="grid md:grid-cols-[100px_1fr] gap-6 py-8 border-t border-white/5 first:border-0"
-              >
-                <div className="font-display italic text-4xl text-amber/40">
-                  {p.step}
+              <div key={i} className="text-center">
+                <div className="w-10 h-10 rounded-full bg-amber/10 border border-amber/20 text-amber-light font-bold text-sm flex items-center justify-center mx-auto mb-4">
+                  {p.num}
                 </div>
-                <div>
-                  <h3 className="font-display text-xl text-ice mb-2">{p.title}</h3>
-                  <p className="text-steel text-sm leading-relaxed max-w-xl">
-                    {p.desc}
-                  </p>
-                </div>
+                <h3 className="font-bold mb-2">{p.title}</h3>
+                <p className="text-steel text-sm leading-relaxed">{p.desc}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <div className="gradient-line max-w-6xl mx-auto" />
+        <div className="gradient-line max-w-5xl mx-auto" />
 
         {/* Pricing */}
         <section id="pricing" className="max-w-5xl mx-auto px-6 py-24">
-          <p className="text-amber font-display italic text-lg mb-3">Pricing</p>
-          <h2 className="font-display text-3xl md:text-4xl mb-4">
-            Security that fits your budget.
-          </h2>
-          <p className="text-steel mb-16 max-w-xl">
-            Start with a free scan. Upgrade to professional testing when you&apos;re ready.
-          </p>
+          <div className="mb-14">
+            <p className="text-amber text-xs uppercase tracking-widest font-semibold mb-3">Pricing</p>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
+              Security that fits your budget.
+            </h2>
+            <p className="text-steel">Start free. Upgrade when you&apos;re ready.</p>
+          </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-5">
             {/* Free */}
-            <div className="rounded-xl border border-white/5 bg-obsidian p-8 flex flex-col">
-              <p className="text-ghost text-xs uppercase tracking-widest mb-2">Surface Scan</p>
-              <div className="font-display text-4xl italic text-ice mb-1">Free</div>
-              <p className="text-ghost text-sm mb-8">Instant, no signup</p>
+            <div className="rounded-xl border border-white/5 bg-obsidian p-7 flex flex-col">
+              <p className="text-ghost text-xs uppercase tracking-widest font-semibold mb-4">Surface Scan</p>
+              <div className="text-4xl font-bold mb-1 tracking-tight">Free</div>
+              <p className="text-ghost text-sm mb-8">Instant results</p>
               <ul className="space-y-3 text-sm text-steel mb-8 flex-1">
-                <li className="flex gap-2"><span className="text-amber">&#10003;</span> SSL & header analysis</li>
-                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Technology detection</li>
-                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Risk score & top findings</li>
-                <li className="flex gap-2 text-ghost"><span className="text-ghost/40">&#10007;</span> Active testing</li>
-                <li className="flex gap-2 text-ghost"><span className="text-ghost/40">&#10007;</span> Full report</li>
+                <li className="flex gap-2"><span className="text-amber">&#10003;</span> SSL &amp; header check</li>
+                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Tech detection</li>
+                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Risk score</li>
+                <li className="flex gap-2 opacity-40"><span>&#10007;</span> Active testing</li>
+                <li className="flex gap-2 opacity-40"><span>&#10007;</span> Full report</li>
               </ul>
               <button
                 onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                className="w-full py-3 border border-white/10 rounded-lg text-steel hover:text-ice hover:border-white/20 transition text-sm"
+                className="w-full py-3 border border-white/10 rounded-lg text-steel hover:text-white hover:border-white/20 transition text-sm font-medium"
               >
                 Scan Now
               </button>
             </div>
 
             {/* Security Audit */}
-            <div className="rounded-xl border border-amber/30 bg-obsidian p-8 flex flex-col relative glow-amber">
-              <div className="absolute -top-3 left-6 px-3 py-1 bg-amber text-void text-xs font-bold rounded">
-                RECOMMENDED
+            <div className="rounded-xl border border-amber/25 bg-obsidian p-7 flex flex-col relative glow-amber">
+              <div className="absolute -top-2.5 left-6 px-3 py-0.5 bg-amber text-void text-[10px] font-bold uppercase tracking-wider rounded">
+                Recommended
               </div>
-              <p className="text-amber text-xs uppercase tracking-widest mb-2">Security Audit</p>
-              <div className="font-display text-4xl italic text-ice mb-1">$249</div>
-              <p className="text-ghost text-sm mb-8">One-time assessment</p>
+              <p className="text-amber text-xs uppercase tracking-widest font-semibold mb-4">Security Audit</p>
+              <div className="text-4xl font-bold mb-1 tracking-tight">$249</div>
+              <p className="text-ghost text-sm mb-8">One-time</p>
               <ul className="space-y-3 text-sm text-steel mb-8 flex-1">
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> Everything in Free</li>
-                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Full port scan & recon</li>
+                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Full recon &amp; port scan</li>
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> Vulnerability scanning</li>
-                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Directory & parameter fuzzing</li>
-                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Professional PDF report</li>
-                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Fix instructions per finding</li>
+                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Directory fuzzing</li>
+                <li className="flex gap-2"><span className="text-amber">&#10003;</span> PDF report + fix guide</li>
               </ul>
               <a
                 href="https://gumroad.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-3 bg-amber hover:bg-amber-light text-void font-semibold rounded-lg transition text-sm text-center block"
+                className="w-full py-3 bg-amber hover:bg-amber-light text-void font-bold rounded-lg transition text-sm text-center block"
               >
                 Book Audit
               </a>
             </div>
 
             {/* Full Pentest */}
-            <div className="rounded-xl border border-white/5 bg-obsidian p-8 flex flex-col">
-              <p className="text-ghost text-xs uppercase tracking-widest mb-2">Full Pentest</p>
-              <div className="font-display text-4xl italic text-ice mb-1">Custom</div>
+            <div className="rounded-xl border border-white/5 bg-obsidian p-7 flex flex-col">
+              <p className="text-ghost text-xs uppercase tracking-widest font-semibold mb-4">Full Pentest</p>
+              <div className="text-4xl font-bold mb-1 tracking-tight">Custom</div>
               <p className="text-ghost text-sm mb-8">Scoped engagement</p>
               <ul className="space-y-3 text-sm text-steel mb-8 flex-1">
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> Everything in Audit</li>
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> SQL injection testing</li>
-                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Authentication testing</li>
-                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Business logic analysis</li>
+                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Auth &amp; logic testing</li>
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> Remediation support</li>
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> Re-test after fixes</li>
               </ul>
               <a
                 href="mailto:contact@foxlock.dev"
-                className="w-full py-3 border border-white/10 rounded-lg text-steel hover:text-ice hover:border-white/20 transition text-sm text-center block"
+                className="w-full py-3 border border-white/10 rounded-lg text-steel hover:text-white hover:border-white/20 transition text-sm text-center block font-medium"
               >
                 Contact Us
               </a>
@@ -339,46 +311,36 @@ export default function Home() {
         </section>
 
         {/* Trust */}
-        <section className="max-w-5xl mx-auto px-6 py-20">
-          <div className="bg-obsidian border border-white/5 rounded-xl p-10 md:p-14">
-            <h2 className="font-display text-2xl md:text-3xl mb-10 text-ice">
-              Our commitment.
-            </h2>
-            <div className="grid md:grid-cols-3 gap-10">
-              <div>
-                <h3 className="font-display italic text-lg text-amber-light mb-2">
-                  Honest reporting
-                </h3>
-                <p className="text-steel text-sm leading-relaxed">
-                  No manufactured urgency. No inflated severity scores.
-                  If your site is secure, we&apos;ll tell you. Our reputation depends on trust, not fear.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-display italic text-lg text-amber-light mb-2">
-                  Always authorized
-                </h3>
-                <p className="text-steel text-sm leading-relaxed">
-                  We never perform active testing without explicit written permission.
-                  The free scan uses only passive reconnaissance on publicly visible information.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-display italic text-lg text-amber-light mb-2">
-                  Plain English
-                </h3>
-                <p className="text-steel text-sm leading-relaxed">
-                  Every finding is explained so you can understand the risk and fix it.
-                  No CVE dumps, no OWASP jargon, no technical gatekeeping.
-                </p>
-              </div>
+        <section className="max-w-5xl mx-auto px-6 pb-24">
+          <div className="rounded-xl border border-white/5 bg-obsidian p-10">
+            <h2 className="text-2xl font-bold mb-8">Our commitment.</h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                {
+                  title: "Honest Reporting",
+                  desc: "No manufactured urgency. No inflated severity. If your site is secure, we'll tell you.",
+                },
+                {
+                  title: "Always Authorized",
+                  desc: "We never perform active testing without explicit written permission. Free scans are passive only.",
+                },
+                {
+                  title: "Plain English",
+                  desc: "Every finding explained so you understand the risk and can fix it. No jargon, no gatekeeping.",
+                },
+              ].map((c, i) => (
+                <div key={i}>
+                  <h3 className="font-bold text-amber-light mb-2">{c.title}</h3>
+                  <p className="text-steel text-sm leading-relaxed">{c.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Final CTA */}
-        <section className="max-w-3xl mx-auto px-6 py-24 text-center">
-          <h2 className="font-display text-3xl md:text-4xl italic mb-6">
+        <section className="max-w-3xl mx-auto px-6 py-20 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-5 tracking-tight">
             Don&apos;t wait for the breach.
           </h2>
           <p className="text-steel mb-10 max-w-lg mx-auto">
@@ -387,7 +349,7 @@ export default function Home() {
           </p>
           <a
             href="mailto:contact@foxlock.dev"
-            className="inline-block px-8 py-4 bg-amber hover:bg-amber-light text-void font-semibold rounded-lg transition"
+            className="inline-block px-8 py-4 bg-amber hover:bg-amber-light text-void font-bold rounded-xl transition"
           >
             Start a Conversation
           </a>
@@ -395,19 +357,20 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-10">
+      <footer className="border-t border-white/5 py-8">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded-sm bg-amber/10 border border-amber/30 flex items-center justify-center text-amber font-display text-xs italic">
-              F
-            </div>
-            <span className="text-sm text-ghost">FoxLock Security</span>
+          <div className="flex items-center gap-2 text-sm text-ghost">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber/50">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            FoxLock Security
           </div>
           <div className="flex gap-6 text-xs text-ghost">
-            <a href="#services" className="hover:text-ice transition">Services</a>
-            <a href="#pricing" className="hover:text-ice transition">Pricing</a>
-            <a href="mailto:contact@foxlock.dev" className="hover:text-ice transition">Contact</a>
-            <a href="https://github.com/lakotafox" className="hover:text-ice transition">GitHub</a>
+            <a href="#services" className="hover:text-white transition">Services</a>
+            <a href="#pricing" className="hover:text-white transition">Pricing</a>
+            <a href="mailto:contact@foxlock.dev" className="hover:text-white transition">Contact</a>
+            <a href="https://github.com/lakotafox" className="hover:text-white transition">GitHub</a>
           </div>
         </div>
       </footer>
