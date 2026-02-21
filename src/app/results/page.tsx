@@ -445,7 +445,7 @@ export default function Results() {
               <div className="text-3xl font-bold text-ice">$39</div>
               <div className="text-ghost text-xs mb-3">/month</div>
               <a
-                href="mailto:contact@foxlocksecurity.com?subject=Security Monitoring"
+                href="mailto:foxlocksecure@gmail.com?subject=Security Monitoring"
                 className="inline-block px-6 py-2.5 border border-amber/30 text-amber-light hover:bg-amber/10 rounded-lg transition text-sm font-medium"
               >
                 Get Started
@@ -465,7 +465,7 @@ export default function Results() {
             that automated scans can&apos;t find.
           </p>
           <a
-            href="mailto:contact@foxlocksecurity.com"
+            href="mailto:foxlocksecure@gmail.com"
             className="inline-block px-8 py-4 bg-amber hover:bg-amber-light text-void font-semibold rounded-lg transition"
           >
             Book a Professional Pentest
