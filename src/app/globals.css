@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-void: #030407;
+  --color-obsidian: #0a0d14;
+  --color-slate-deep: #111827;
+  --color-amber: #d97706;
+  --color-amber-light: #f59e0b;
+  --color-amber-glow: #fbbf24;
+  --color-ice: #e0f2fe;
+  --color-steel: #94a3b8;
+  --color-ghost: #475569;
+  --font-display: 'Instrument Serif', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-void);
+}
+
+/* Noise texture overlay */
+.noise::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Gradient line */
+.gradient-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-amber) 20%, var(--color-amber-glow) 50%, var(--color-amber) 80%, transparent);
+}
+
+/* Score ring animation */
+@keyframes score-fill {
+  from { stroke-dashoffset: 339.292; }
+}
+
+.score-ring {
+  animation: score-fill 1.5s ease-out forwards;
+}
+
+/* Stagger reveal */
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  animation: reveal-up 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.reveal-d1 { animation-delay: 0.1s; }
+.reveal-d2 { animation-delay: 0.2s; }
+.reveal-d3 { animation-delay: 0.3s; }
+.reveal-d4 { animation-delay: 0.4s; }
+.reveal-d5 { animation-delay: 0.5s; }
+.reveal-d6 { animation-delay: 0.6s; }
+
+/* Glow effect */
+.glow-amber {
+  box-shadow: 0 0 30px rgba(217, 119, 6, 0.15), 0 0 60px rgba(217, 119, 6, 0.05);
+}
+
+/* Scan pulse */
+@keyframes pulse-scan {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.scan-pulse {
+  animation: pulse-scan 2s ease-in-out infinite;
+}
