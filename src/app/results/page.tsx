@@ -115,6 +115,9 @@ function ScoreGauge({ score, riskLevel }: { score: number; riskLevel: string }) 
 
 export default function Results() {
   const [result, setResult] = useState<ScanResult | null>(null);
+  const [email, setEmail] = useState("");
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -125,6 +128,35 @@ export default function Results() {
     }
     setResult(JSON.parse(stored));
   }, [router]);
+
+  function handleCheckout() {
+    router.push("/checkout");
+  }
+
+  async function handleEmailSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setEmailLoading(true);
+
+    try {
+      await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          url: result?.url,
+          score: result?.score,
+          riskLevel: result?.riskLevel,
+          findingsCount: result?.findings.length,
+        }),
+      });
+    } catch {
+      // Still show success — we don't want to block the UX
+    }
+
+    setEmailSubmitted(true);
+    setEmailLoading(false);
+  }
 
   if (!result) {
     return (
@@ -138,7 +170,7 @@ export default function Results() {
   const lockedFindings = result.findings.slice(3);
 
   return (
-    <div className="min-h-screen bg-void noise">
+    <div className="min-h-screen bg-void">
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-amber/3 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Nav */}
@@ -160,7 +192,7 @@ export default function Results() {
 
       <main className="max-w-5xl mx-auto px-6 py-12">
         {/* Header */}
-        <div className="mb-12 reveal">
+        <div className="mb-12">
           <p className="text-amber font-bold text-lg mb-2">Surface Scan Report</p>
           <h1 className="font-bold text-3xl text-ice mb-2">{result.url.replace(/^https?:\/\//, '')}</h1>
           <p className="text-ghost text-sm">
@@ -169,7 +201,7 @@ export default function Results() {
         </div>
 
         {/* Score + Summary */}
-        <div className="grid md:grid-cols-[220px_1fr] gap-10 mb-14 p-8 rounded-xl border border-white/5 bg-obsidian reveal reveal-d1">
+        <div className="grid md:grid-cols-[220px_1fr] gap-10 mb-14 p-8 rounded-xl border border-white/5 bg-obsidian">
           <ScoreGauge score={result.score} riskLevel={result.riskLevel} />
           <div className="flex flex-col justify-center">
             <p className="text-ice text-lg leading-relaxed font-bold">
@@ -179,7 +211,7 @@ export default function Results() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-14 reveal reveal-d2">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-14">
           {[
             {
               label: "SSL",
@@ -205,7 +237,7 @@ export default function Results() {
 
         {/* SSL */}
         {result.ssl && (
-          <section className="mb-10 reveal reveal-d3">
+          <section className="mb-10">
             <h2 className="font-bold text-xl text-ice mb-4">SSL Certificate</h2>
             <div className="p-6 rounded-xl border border-white/5 bg-obsidian">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
@@ -235,7 +267,7 @@ export default function Results() {
         )}
 
         {/* Headers */}
-        <section className="mb-10 reveal reveal-d4">
+        <section className="mb-10">
           <h2 className="font-bold text-xl text-ice mb-4">Security Headers</h2>
           <div className="space-y-2">
             {result.headers.map((h, i) => (
@@ -261,7 +293,7 @@ export default function Results() {
 
         {/* Tech */}
         {(result.tech.server || result.tech.cms || result.tech.framework) && (
-          <section className="mb-10 reveal reveal-d5">
+          <section className="mb-10">
             <h2 className="font-bold text-xl text-ice mb-4">Detected Technology</h2>
             <div className="p-6 rounded-xl border border-white/5 bg-obsidian">
               <div className="flex flex-wrap gap-2">
@@ -296,7 +328,7 @@ export default function Results() {
         )}
 
         {/* Findings */}
-        <section className="mb-10 reveal reveal-d6">
+        <section className="mb-10">
           <h2 className="font-bold text-xl text-ice mb-4">Findings</h2>
 
           <div className="space-y-3">
@@ -318,8 +350,10 @@ export default function Results() {
               </div>
             ))}
 
+            {/* Email gate for remaining findings */}
             {lockedFindings.length > 0 && (
               <div className="relative mt-6">
+                {/* Blurred preview of locked findings */}
                 <div className="space-y-3 blur-sm pointer-events-none select-none opacity-50">
                   {lockedFindings.slice(0, 2).map((f, i) => (
                     <div key={i} className={`p-5 rounded-xl border ${SEVERITY_COLORS[f.severity]}`}>
@@ -333,23 +367,62 @@ export default function Results() {
                     </div>
                   ))}
                 </div>
+
+                {/* Overlay: email capture → then upsell */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="bg-obsidian border border-amber/20 rounded-xl p-8 text-center max-w-md glow-amber">
                     <p className="font-bold text-2xl text-ice mb-2">
                       {lockedFindings.length} more finding{lockedFindings.length !== 1 ? "s" : ""}
                     </p>
-                    <p className="text-steel text-sm mb-6">
-                      Get a professional security audit with complete findings,
-                      business impact analysis, and step-by-step remediation.
-                    </p>
-                    <a
-                      href="https://gumroad.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block px-8 py-3 bg-amber hover:bg-amber-light text-void font-semibold rounded-lg transition"
-                    >
-                      Get Full Audit &mdash; $249
-                    </a>
+
+                    {!emailSubmitted ? (
+                      <>
+                        <p className="text-steel text-sm mb-5">
+                          Enter your email to get the full report with all findings
+                          and remediation steps sent to your inbox.
+                        </p>
+                        <form onSubmit={handleEmailSubmit} className="mb-4">
+                          <div className="flex bg-void border border-white/10 rounded-lg overflow-hidden focus-within:border-amber/40 transition">
+                            <input
+                              type="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              placeholder="you@company.com"
+                              required
+                              className="flex-1 bg-transparent px-4 py-3 text-white placeholder-ghost/40 focus:outline-none text-sm"
+                              disabled={emailLoading}
+                            />
+                            <button
+                              type="submit"
+                              disabled={emailLoading || !email.trim()}
+                              className="px-5 py-3 bg-amber hover:bg-amber-light disabled:bg-white/5 disabled:text-ghost text-void font-bold transition text-sm whitespace-nowrap"
+                            >
+                              {emailLoading ? "..." : "Send Report"}
+                            </button>
+                          </div>
+                        </form>
+                        <p className="text-ghost text-xs">
+                          Free. No spam. Just your security findings.
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-12 h-12 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto mb-4">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-400">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        </div>
+                        <p className="text-steel text-sm mb-6">
+                          Check your inbox. Want a deeper analysis with active testing?
+                        </p>
+                        <button
+                          onClick={handleCheckout}
+                          className="inline-block px-8 py-3 bg-amber hover:bg-amber-light text-void font-semibold rounded-lg transition"
+                        >
+                          Get Full Audit &mdash; $199
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -357,7 +430,31 @@ export default function Results() {
           </div>
         </section>
 
-        {/* Upsell */}
+        {/* Monitoring Upsell */}
+        <section className="mb-10 p-8 rounded-xl border border-white/5 bg-obsidian">
+          <div className="grid md:grid-cols-[1fr_auto] gap-8 items-center">
+            <div>
+              <p className="text-amber text-xs uppercase tracking-widest font-semibold mb-2">Continuous Protection</p>
+              <h3 className="font-bold text-xl text-ice mb-2">Security Monitoring</h3>
+              <p className="text-steel text-sm leading-relaxed">
+                Get weekly re-scans and instant email alerts when your security posture changes.
+                SSL expiry warnings, new vulnerability detection, header changes, and more.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-ice">$39</div>
+              <div className="text-ghost text-xs mb-3">/month</div>
+              <a
+                href="mailto:contact@foxlocksecurity.com?subject=Security Monitoring"
+                className="inline-block px-6 py-2.5 border border-amber/30 text-amber-light hover:bg-amber/10 rounded-lg transition text-sm font-medium"
+              >
+                Get Started
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* Pentest Upsell */}
         <section className="mb-12 p-10 rounded-xl border border-amber/15 bg-amber/3 text-center">
           <p className="font-bold text-2xl text-ice mb-4">
             This scan checked the surface.
@@ -368,7 +465,7 @@ export default function Results() {
             that automated scans can&apos;t find.
           </p>
           <a
-            href="mailto:contact@foxlock.dev"
+            href="mailto:contact@foxlocksecurity.com"
             className="inline-block px-8 py-4 bg-amber hover:bg-amber-light text-void font-semibold rounded-lg transition"
           >
             Book a Professional Pentest
@@ -377,7 +474,7 @@ export default function Results() {
       </main>
 
       <footer className="border-t border-white/5 py-6 text-center text-ghost text-xs">
-        FoxLock Security &mdash; Penetration testing for small businesses.
+        FoxLock Security &mdash; foxlocksecurity.com
       </footer>
     </div>
   );

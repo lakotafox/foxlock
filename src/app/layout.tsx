@@ -8,14 +8,16 @@ const font = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "FoxLock — Penetration Testing & Security Audits",
+  title: "FoxLock Security — Penetration Testing & Security Audits",
   description:
     "AI-powered penetration testing for small businesses. Real security assessments with professional reports in plain English.",
+  metadataBase: new URL("https://foxlocksecurity.com"),
   openGraph: {
-    title: "FoxLock — Penetration Testing & Security Audits",
+    title: "FoxLock Security — Penetration Testing & Security Audits",
     description:
       "See your website the way an attacker does. AI-powered security assessments for businesses.",
     type: "website",
+    url: "https://foxlocksecurity.com",
   },
 };
 

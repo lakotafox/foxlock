@@ -64,7 +64,7 @@ export default function Home() {
             <a href="#how-it-works" className="text-steel hover:text-white transition">How It Works</a>
             <a href="#pricing" className="text-steel hover:text-white transition">Pricing</a>
             <a
-              href="mailto:contact@foxlock.dev"
+              href="mailto:contact@foxlocksecurity.com"
               className="px-4 py-2 bg-amber hover:bg-amber-light text-void font-semibold rounded-lg transition text-sm"
             >
               Contact
@@ -242,18 +242,17 @@ export default function Home() {
             <p className="text-steel">Start free. Upgrade when you&apos;re ready.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-4 gap-4">
             {/* Free */}
-            <div className="rounded-xl border border-white/5 bg-obsidian p-7 flex flex-col">
+            <div className="rounded-xl border border-white/5 bg-obsidian p-6 flex flex-col">
               <p className="text-ghost text-xs uppercase tracking-widest font-semibold mb-4">Surface Scan</p>
-              <div className="text-4xl font-bold mb-1 tracking-tight">Free</div>
-              <p className="text-ghost text-sm mb-8">Instant results</p>
-              <ul className="space-y-3 text-sm text-steel mb-8 flex-1">
+              <div className="text-3xl font-bold mb-1 tracking-tight">Free</div>
+              <p className="text-ghost text-sm mb-6">Instant results</p>
+              <ul className="space-y-2.5 text-sm text-steel mb-6 flex-1">
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> SSL &amp; header check</li>
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> Tech detection</li>
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> Risk score</li>
                 <li className="flex gap-2 opacity-40"><span>&#10007;</span> Active testing</li>
-                <li className="flex gap-2 opacity-40"><span>&#10007;</span> Full report</li>
               </ul>
               <button
                 onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
@@ -263,25 +262,41 @@ export default function Home() {
               </button>
             </div>
 
+            {/* Monitoring */}
+            <div className="rounded-xl border border-white/5 bg-obsidian p-6 flex flex-col">
+              <p className="text-ghost text-xs uppercase tracking-widest font-semibold mb-4">Monitoring</p>
+              <div className="text-3xl font-bold mb-1 tracking-tight">$39<span className="text-lg text-ghost font-normal">/mo</span></div>
+              <p className="text-ghost text-sm mb-6">Continuous</p>
+              <ul className="space-y-2.5 text-sm text-steel mb-6 flex-1">
+                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Weekly re-scans</li>
+                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Email alerts</li>
+                <li className="flex gap-2"><span className="text-amber">&#10003;</span> SSL expiry warnings</li>
+                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Change detection</li>
+              </ul>
+              <a
+                href="mailto:contact@foxlocksecurity.com?subject=Security Monitoring"
+                className="w-full py-3 border border-white/10 rounded-lg text-steel hover:text-white hover:border-white/20 transition text-sm text-center block font-medium"
+              >
+                Get Started
+              </a>
+            </div>
+
             {/* Security Audit */}
-            <div className="rounded-xl border border-amber/25 bg-obsidian p-7 flex flex-col relative glow-amber">
+            <div className="rounded-xl border border-amber/25 bg-obsidian p-6 flex flex-col relative glow-amber">
               <div className="absolute -top-2.5 left-6 px-3 py-0.5 bg-amber text-void text-[10px] font-bold uppercase tracking-wider rounded">
-                Recommended
+                Popular
               </div>
               <p className="text-amber text-xs uppercase tracking-widest font-semibold mb-4">Security Audit</p>
-              <div className="text-4xl font-bold mb-1 tracking-tight">$249</div>
-              <p className="text-ghost text-sm mb-8">One-time</p>
-              <ul className="space-y-3 text-sm text-steel mb-8 flex-1">
-                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Everything in Free</li>
+              <div className="text-3xl font-bold mb-1 tracking-tight">$199</div>
+              <p className="text-ghost text-sm mb-6">One-time report</p>
+              <ul className="space-y-2.5 text-sm text-steel mb-6 flex-1">
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> Full recon &amp; port scan</li>
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> Vulnerability scanning</li>
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> Directory fuzzing</li>
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> PDF report + fix guide</li>
               </ul>
               <a
-                href="https://gumroad.com"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/checkout"
                 className="w-full py-3 bg-amber hover:bg-amber-light text-void font-bold rounded-lg transition text-sm text-center block"
               >
                 Book Audit
@@ -289,19 +304,18 @@ export default function Home() {
             </div>
 
             {/* Full Pentest */}
-            <div className="rounded-xl border border-white/5 bg-obsidian p-7 flex flex-col">
+            <div className="rounded-xl border border-white/5 bg-obsidian p-6 flex flex-col">
               <p className="text-ghost text-xs uppercase tracking-widest font-semibold mb-4">Full Pentest</p>
-              <div className="text-4xl font-bold mb-1 tracking-tight">Custom</div>
-              <p className="text-ghost text-sm mb-8">Scoped engagement</p>
-              <ul className="space-y-3 text-sm text-steel mb-8 flex-1">
+              <div className="text-3xl font-bold mb-1 tracking-tight">Custom</div>
+              <p className="text-ghost text-sm mb-6">Scoped engagement</p>
+              <ul className="space-y-2.5 text-sm text-steel mb-6 flex-1">
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> Everything in Audit</li>
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> SQL injection testing</li>
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> Auth &amp; logic testing</li>
-                <li className="flex gap-2"><span className="text-amber">&#10003;</span> Remediation support</li>
                 <li className="flex gap-2"><span className="text-amber">&#10003;</span> Re-test after fixes</li>
               </ul>
               <a
-                href="mailto:contact@foxlock.dev"
+                href="mailto:contact@foxlocksecurity.com"
                 className="w-full py-3 border border-white/10 rounded-lg text-steel hover:text-white hover:border-white/20 transition text-sm text-center block font-medium"
               >
                 Contact Us
@@ -348,7 +362,7 @@ export default function Home() {
             or worse, their attackers. Find out from us first.
           </p>
           <a
-            href="mailto:contact@foxlock.dev"
+            href="mailto:contact@foxlocksecurity.com"
             className="inline-block px-8 py-4 bg-amber hover:bg-amber-light text-void font-bold rounded-xl transition"
           >
             Start a Conversation
@@ -369,7 +383,7 @@ export default function Home() {
           <div className="flex gap-6 text-xs text-ghost">
             <a href="#services" className="hover:text-white transition">Services</a>
             <a href="#pricing" className="hover:text-white transition">Pricing</a>
-            <a href="mailto:contact@foxlock.dev" className="hover:text-white transition">Contact</a>
+            <a href="mailto:contact@foxlocksecurity.com" className="hover:text-white transition">Contact</a>
             <a href="https://github.com/lakotafox" className="hover:text-white transition">GitHub</a>
           </div>
         </div>
