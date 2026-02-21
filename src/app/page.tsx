@@ -153,21 +153,18 @@ export default function Home() {
             {[
               {
                 num: "01",
-                title: "Attack Surface Mapping",
-                desc: "Subdomain enumeration, port scanning, service fingerprinting, technology detection. We find every entry point.",
-                tools: "amass  subfinder  nmap  httpx",
+                title: "Find Every Entry Point",
+                desc: "We map your entire digital footprint — every subdomain, open port, and connected service. If there's a way in, we find it.",
               },
               {
                 num: "02",
-                title: "Vulnerability Scanning",
-                desc: "CVE detection, web server misconfigurations, outdated software, known exploits across your infrastructure.",
-                tools: "nuclei  nikto  wafw00f",
+                title: "Test for Real Threats",
+                desc: "Our AI scans for thousands of known vulnerabilities, misconfigurations, and outdated software that hackers actively exploit.",
               },
               {
                 num: "03",
-                title: "Active Testing",
-                desc: "Directory fuzzing, SQL injection probing, parameter testing, authentication analysis. Controlled offensive testing.",
-                tools: "ffuf  gobuster  sqlmap  hydra",
+                title: "Deliver a Clear Action Plan",
+                desc: "You get a plain-English report with every issue ranked by severity, its business impact, and exactly how to fix it.",
               },
             ].map((s, i) => (
               <div
@@ -176,30 +173,24 @@ export default function Home() {
               >
                 <span className="text-amber/30 text-xs font-mono">{s.num}</span>
                 <h3 className="text-lg font-bold mt-3 mb-2 group-hover:text-amber-light transition">{s.title}</h3>
-                <p className="text-steel text-sm leading-relaxed mb-4">{s.desc}</p>
-                <p className="text-ghost/50 text-xs font-mono">{s.tools}</p>
+                <p className="text-steel text-sm leading-relaxed">{s.desc}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Toolkit Bar */}
+        {/* Why Us */}
         <section className="max-w-5xl mx-auto px-6 pb-20">
-          <div className="p-6 rounded-xl border border-white/5 bg-obsidian">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-xs text-ghost uppercase tracking-widest font-semibold">Our Toolkit</p>
-              <p className="text-xs text-ghost">11 professional-grade tools</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {["nmap", "nuclei", "nikto", "sqlmap", "ffuf", "gobuster", "amass", "subfinder", "httpx", "hydra", "wafw00f"].map((t) => (
-                <span
-                  key={t}
-                  className="px-3 py-1.5 rounded-lg border border-white/5 bg-void text-sm font-mono text-steel hover:text-amber-light hover:border-amber/20 transition"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
+          <div className="p-8 rounded-xl border border-white/5 bg-obsidian text-center">
+            <p className="text-amber text-xs uppercase tracking-widest font-semibold mb-4">Why FoxLock</p>
+            <h3 className="text-2xl md:text-3xl font-bold text-ice mb-4">
+              Advanced toolkit. AI-powered analysis. Expert team.
+            </h3>
+            <p className="text-steel max-w-2xl mx-auto leading-relaxed">
+              We combine 11 professional-grade security tools with AI analysis
+              to find vulnerabilities that automated scanners miss. Every report is
+              reviewed by our security team and written so you can actually act on it.
+            </p>
           </div>
         </section>
 
