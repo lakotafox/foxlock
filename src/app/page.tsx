@@ -76,7 +76,7 @@ export default function Home() {
                   <div className="fixed inset-0 z-40" onClick={() => setContactOpen(false)} />
                   <div className="absolute right-0 top-12 z-50 w-56 p-3 rounded-xl border border-white/10 bg-obsidian shadow-2xl space-y-2">
                     <a
-                      href="sms:+13852507195?body=Hi%20FoxLock%2C%20I%27d%20like%20to%20learn%20about%20a%20security%20audit."
+                      href="sms:+18017962362?body=Hi%20FoxLock%2C%20I%27d%20like%20to%20learn%20about%20a%20security%20audit."
                       className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition text-sm text-ice"
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-amber-light">
@@ -85,7 +85,7 @@ export default function Home() {
                       Text Us
                     </a>
                     <a
-                      href="tel:+13852507195"
+                      href="tel:+18017962362"
                       className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition text-sm text-ice"
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-amber-light">
@@ -392,7 +392,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="sms:+13852507195?body=Hi%20FoxLock%2C%20I%27d%20like%20to%20learn%20about%20a%20security%20audit%20for%20my%20website."
+              href="sms:+18017962362?body=Hi%20FoxLock%2C%20I%27d%20like%20to%20learn%20about%20a%20security%20audit%20for%20my%20website."
               className="flex items-center gap-3 px-8 py-4 bg-amber hover:bg-amber-light text-void font-bold rounded-xl transition"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -401,7 +401,7 @@ export default function Home() {
               Text Us
             </a>
             <a
-              href="tel:+13852507195"
+              href="tel:+18017962362"
               className="flex items-center gap-3 px-8 py-4 border border-white/10 hover:border-white/20 text-ice font-bold rounded-xl transition"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
