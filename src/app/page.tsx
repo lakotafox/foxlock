@@ -231,8 +231,8 @@ export default function Home() {
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
+                { num: "$7M+", label: "In assets protected" },
                 { num: "100+", label: "Vulnerabilities found" },
-                { num: "7", label: "Credit cards protected" },
                 { num: "9,000+", label: "User records secured" },
                 { num: "56", label: "Open databases closed" },
               ].map((s, i) => (
