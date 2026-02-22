@@ -219,16 +219,29 @@ export default function Home() {
 
         {/* Why Us */}
         <section className="max-w-5xl mx-auto px-6 pb-20">
-          <div className="p-8 rounded-xl border border-white/5 bg-obsidian text-center">
-            <p className="text-amber text-xs uppercase tracking-widest font-semibold mb-4">Why FoxLock</p>
-            <h3 className="text-2xl md:text-3xl font-bold text-ice mb-4">
-              Advanced toolkit. AI-powered analysis. Expert team.
+          <div className="p-8 rounded-xl border border-white/5 bg-obsidian">
+            <p className="text-amber text-xs uppercase tracking-widest font-semibold mb-4 text-center">Why FoxLock</p>
+            <h3 className="text-2xl md:text-3xl font-bold text-ice mb-4 text-center">
+              Advanced toolkit. AI-powered analysis. Proven results.
             </h3>
-            <p className="text-steel max-w-2xl mx-auto leading-relaxed">
-              We combine 11 professional-grade security tools with AI analysis
-              to find vulnerabilities that automated scanners miss. Every report is
-              reviewed by our security team and written so you can actually act on it.
+            <p className="text-steel max-w-2xl mx-auto leading-relaxed text-center mb-8">
+              We&apos;ve found exposed credit cards, leaked databases, and wide-open admin panels
+              in real companies. We combine professional-grade tools with AI analysis
+              to find what automated scanners miss.
             </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { num: "100+", label: "Vulnerabilities found" },
+                { num: "7", label: "Credit cards protected" },
+                { num: "9,000+", label: "User records secured" },
+                { num: "56", label: "Open databases closed" },
+              ].map((s, i) => (
+                <div key={i} className="text-center p-4 rounded-lg border border-white/5 bg-void">
+                  <div className="text-2xl font-bold text-amber-light">{s.num}</div>
+                  <div className="text-xs text-ghost mt-1">{s.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
