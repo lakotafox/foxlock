@@ -112,7 +112,7 @@ function Contract({ html, articleRef }: { html: string; articleRef: React.RefObj
   return (
     <article
       ref={articleRef}
-      className="contract paper rounded-xl border border-white/5 bg-obsidian/80 px-5 sm:px-8 py-4 glow-amber"
+      className="contract paper rounded-xl border border-gray-200 bg-white px-5 sm:px-8 py-4 shadow-sm"
     />
   );
 }
@@ -120,10 +120,10 @@ function Contract({ html, articleRef }: { html: string; articleRef: React.RefObj
 function LockMark({ size = 28 }: { size?: number }) {
   return (
     <div
-      className="rounded bg-amber/15 border border-amber/30 flex items-center justify-center shrink-0"
+      className="rounded fl-grad-bg flex items-center justify-center shrink-0"
       style={{ width: size, height: size }}
     >
-      <svg width={size / 2} height={size / 2} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-amber-light">
+      <svg width={size / 2} height={size / 2} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-white">
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
       </svg>
@@ -166,7 +166,7 @@ export default function SignClient({ variant = "client" }: { variant?: SignVaria
     ctx.lineWidth = 2.6;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.strokeStyle = "#f0f4f8";
+    ctx.strokeStyle = "#111827";
     setHasInk(false);
   }, [status, mode]);
 
@@ -290,85 +290,88 @@ export default function SignClient({ variant = "client" }: { variant?: SignVaria
     }
   };
 
-  if (!details) return <div className="min-h-screen bg-void" />;
+  if (!details) return <div className="min-h-screen bg-white" />;
 
   return (
-    <div className="min-h-screen bg-void text-ice">
+    <div className="min-h-screen bg-white text-gray-900">
       <style>{`
-        .contract h2 { color: #fbbf24; font-weight: 700; font-size: 1.05rem; margin: 2rem 0 .6rem; letter-spacing: -.01em; }
-        .contract p { color: #cbd5e1; line-height: 1.7; margin: .6rem 0; }
+        body { background: #fff; }
+        .fl-grad-bg { background: linear-gradient(135deg, #7c3aed, #db2777); }
+        .fl-grad-text { background: linear-gradient(90deg, #7c3aed, #db2777); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .contract h2 { color: #7c3aed; font-weight: 700; font-size: 1.05rem; margin: 2rem 0 .6rem; letter-spacing: -.01em; }
+        .contract p { color: #111827; line-height: 1.7; margin: .6rem 0; }
         .contract ul { margin: .5rem 0 .9rem; padding-left: 1.15rem; list-style: disc; }
-        .contract li { color: #cbd5e1; line-height: 1.65; margin: .45rem 0; }
-        .contract li::marker { color: #d97706; }
-        .contract strong { color: #f0f4f8; font-weight: 650; }
+        .contract li { color: #111827; line-height: 1.65; margin: .45rem 0; }
+        .contract li::marker { color: #db2777; }
+        .contract strong { color: #000; font-weight: 650; }
         .contract ul:has(li.choice) { list-style: none; padding-left: 0; }
-        .contract li.choice label { display: flex; gap: .7rem; align-items: flex-start; padding: .7rem .8rem; border: 1px solid rgba(255,255,255,.08); border-radius: .6rem; cursor: pointer; }
-        .contract li.choice label:has(input:checked) { border-color: rgba(245,158,11,.55); background: rgba(245,158,11,.07); }
-        .contract li.choice input[type=checkbox], .contract li.choice input[type=radio] { accent-color: #f59e0b; width: 1.2rem; height: 1.2rem; margin-top: .2rem; flex-shrink: 0; }
-        .contract li.choice input[type=text] { background: #05070b; border: 1px solid rgba(255,255,255,.15); border-radius: .4rem; padding: .35rem .55rem; color: #f0f4f8; font-size: 1rem; width: 11rem; max-width: 100%; }
+        .contract li.choice label { display: flex; gap: .7rem; align-items: flex-start; padding: .7rem .8rem; border: 1px solid #e5e7eb; border-radius: .6rem; cursor: pointer; }
+        .contract li.choice label:has(input:checked) { border-color: #a78bfa; background: #faf5ff; }
+        .contract li.choice input[type=checkbox], .contract li.choice input[type=radio] { accent-color: #7c3aed; width: 1.2rem; height: 1.2rem; margin-top: .2rem; flex-shrink: 0; }
+        .contract li.choice input[type=text] { background: #fff; border: 1px solid #d1d5db; border-radius: .4rem; padding: .35rem .55rem; color: #111827; font-size: 1rem; width: 11rem; max-width: 100%; }
         @media print {
-          body, .bg-void { background: #fff !important; }
+          body { background: #fff !important; }
           .no-print { display: none !important; }
-          .contract h2 { color: #92400e; }
+          .contract h2 { color: #6d28d9; }
           .contract p, .contract li, .print-ink { color: #111 !important; }
           .contract strong { color: #000; }
           .paper { background: #fff !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
         }
       `}</style>
 
-      <header className="border-b border-white/5 bg-void/80 backdrop-blur-md sticky top-0 z-30 no-print">
+      <header className="border-b border-gray-200 bg-white/90 backdrop-blur-md sticky top-0 z-30 no-print">
         <div className="max-w-3xl mx-auto px-4 py-3.5 flex items-center justify-between">
           <a href="/" className="flex items-center gap-2.5">
             <LockMark />
             <span className="text-lg font-bold tracking-tight">
-              Fox<span className="text-amber-light">Lock</span>
+              <span className="fl-grad-text">FoxLock</span>
             </span>
           </a>
           {details.caseId && (
-            <span className="text-xs font-mono text-steel border border-white/10 rounded px-2 py-1">{details.caseId}</span>
+            <span className="text-xs font-mono text-gray-500 border border-gray-300 rounded px-2 py-1">{details.caseId}</span>
           )}
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 pt-8 pb-40">
-        <p className="text-amber-light text-xs font-semibold uppercase tracking-[0.2em] mb-2">{v.eyebrow}</p>
+        <p className="text-[#7c3aed] text-xs font-semibold uppercase tracking-[0.2em] mb-2">{v.eyebrow}</p>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight mb-2 print-ink">
           {v.title}
         </h1>
-        <p className="text-steel text-sm mb-6 print-ink">
-          {details.client ? `Prepared for ${details.client}. ` : ""}Read it through{variant === "witness" ? ", tick what you’re comfortable with" : ""}, then tap <span className="text-amber-light font-semibold">Sign here</span> at the bottom.
+        <p className="text-gray-600 text-sm mb-6 print-ink">
+          {details.client ? `Prepared for ${details.client}. ` : ""}Read it through{variant === "witness" ? ", tick what you’re comfortable with" : ""}, then tap <span className="text-[#db2777] font-semibold">Sign here</span> at the bottom.
         </p>
-        <div className="gradient-line mb-6" />
+        <div className="h-0.5 rounded-full fl-grad-bg mb-6" />
 
         <Contract html={fillContract(variant, details)} articleRef={articleRef} />
 
         {status === "signed" && signature && signedAt && (
-          <section className="paper mt-8 rounded-xl border border-amber/30 bg-obsidian px-5 sm:px-8 py-6">
+          <section className="paper mt-8 rounded-xl border border-purple-200 bg-white px-5 sm:px-8 py-6 shadow-sm">
             <div className="flex items-center gap-3 mb-4 no-print">
-              <div className="w-9 h-9 rounded-full bg-amber/15 border border-amber/40 flex items-center justify-center text-amber-light">
+              <div className="w-9 h-9 rounded-full fl-grad-bg flex items-center justify-center text-white">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
               </div>
               <div>
                 <p className="font-bold">Signed. Thank you{details.client ? `, ${details.client.split(" ")[0]}` : ""}.</p>
-                <p className="text-steel text-sm">FoxLock has received your signed {variant === "witness" ? "consent" : "agreement"}.</p>
+                <p className="text-gray-600 text-sm">FoxLock has received your signed {variant === "witness" ? "consent" : "agreement"}.</p>
               </div>
             </div>
             {variant === "witness" && choices && (
               <div className="mb-4">
-                <p className="text-steel text-sm mb-1.5 print-ink">You agreed to</p>
+                <p className="text-gray-600 text-sm mb-1.5 print-ink">You agreed to</p>
                 <ul className="text-sm list-disc pl-5 space-y-1 print-ink">
                   {choiceSummary(choices).map((line) => <li key={line}>{line}</li>)}
                 </ul>
               </div>
             )}
-            <div className="rounded-lg bg-ice p-3 mb-3">
+            <div className="rounded-lg bg-gray-50 border border-gray-200 p-3 mb-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={signature} alt="Your signature" className="w-full max-w-sm mx-auto" />
             </div>
-            <p className="text-sm print-ink"><span className="text-steel print-ink">Signed by</span> {name.trim()}</p>
-            <p className="text-sm print-ink"><span className="text-steel print-ink">Date</span> {signedAt.toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" })}</p>
-            <p className="text-[11px] text-ghost font-mono mt-3 break-all print-ink">{variant === "witness" ? "Consent" : "Agreement"} version {v.version.slice(0, 16)}</p>
-            <button onClick={() => window.print()} className="no-print mt-5 w-full sm:w-auto rounded-lg border border-white/15 px-5 py-3 text-sm font-semibold hover:bg-white/5 transition">
+            <p className="text-sm print-ink"><span className="text-gray-600 print-ink">Signed by</span> {name.trim()}</p>
+            <p className="text-sm print-ink"><span className="text-gray-600 print-ink">Date</span> {signedAt.toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" })}</p>
+            <p className="text-[11px] text-gray-400 font-mono mt-3 break-all print-ink">{variant === "witness" ? "Consent" : "Agreement"} version {v.version.slice(0, 16)}</p>
+            <button onClick={() => window.print()} className="no-print mt-5 w-full sm:w-auto rounded-lg border border-gray-300 px-5 py-3 text-sm font-semibold hover:bg-gray-50 transition">
               Save a copy
             </button>
           </section>
@@ -376,12 +379,12 @@ export default function SignClient({ variant = "client" }: { variant?: SignVaria
       </main>
 
       {status !== "signed" && (
-        <div className="no-print fixed bottom-0 inset-x-0 z-40 border-t border-white/10 bg-void/90 backdrop-blur-md" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+        <div className="no-print fixed bottom-0 inset-x-0 z-40 border-t border-gray-200 bg-white/95 backdrop-blur-md" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
           <div className="max-w-3xl mx-auto px-4 py-3">
-            {choiceError && <p className="text-sm text-amber-glow mb-2 text-center">{choiceError}</p>}
+            {choiceError && <p className="text-sm text-[#db2777] mb-2 text-center">{choiceError}</p>}
             <button
               onClick={openSheet}
-              className="w-full rounded-xl bg-amber-light text-void font-bold text-base py-4 shadow-[0_0_30px_rgba(245,158,11,0.35)] active:scale-[0.99] transition flex items-center justify-center gap-2"
+              className="w-full rounded-xl fl-grad-bg text-white font-bold text-base py-4 shadow-[0_8px_24px_rgba(124,58,237,0.3)] active:scale-[0.99] transition flex items-center justify-center gap-2"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
               Sign here
@@ -392,33 +395,33 @@ export default function SignClient({ variant = "client" }: { variant?: SignVaria
 
       {(status === "signing" || status === "sending" || status === "error") && (
         <div className="no-print fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-          <div className="absolute inset-0 bg-black/70" onClick={() => status !== "sending" && setStatus("reading")} />
-          <div className="relative w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl border border-white/10 bg-obsidian px-5 pt-5 pb-6" style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}>
+          <div className="absolute inset-0 bg-black/40" onClick={() => status !== "sending" && setStatus("reading")} />
+          <div className="relative w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-6" style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
                 <LockMark size={24} />
                 <p className="font-bold">{variant === "witness" ? "Sign consent" : "Sign agreement"}</p>
               </div>
-              <button onClick={() => setStatus("reading")} disabled={status === "sending"} className="text-steel hover:text-white p-1" aria-label="Close">
+              <button onClick={() => setStatus("reading")} disabled={status === "sending"} className="text-gray-600 hover:text-gray-900 p-1" aria-label="Close">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
               </button>
             </div>
 
-            <label className="block text-xs text-steel mb-1.5">Full name</label>
+            <label className="block text-xs text-gray-600 mb-1.5">Full name</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your full name"
               autoComplete="name"
-              className="w-full rounded-lg bg-void border border-white/10 px-3.5 py-3 text-base outline-none focus:border-amber/60 mb-4"
+              className="w-full rounded-lg bg-white border border-gray-300 px-3.5 py-3 text-base outline-none focus:border-[#7c3aed] mb-4"
             />
 
-            <div className="flex gap-1 p-1 rounded-lg bg-void border border-white/5 mb-3 text-sm">
+            <div className="flex gap-1 p-1 rounded-lg bg-gray-100 border border-gray-200 mb-3 text-sm">
               {(["draw", "type"] as const).map((m) => (
                 <button
                   key={m}
                   onClick={() => setMode(m)}
-                  className={`flex-1 rounded-md py-2 font-semibold transition ${mode === m ? "bg-amber/15 text-amber-light" : "text-steel"}`}
+                  className={`flex-1 rounded-md py-2 font-semibold transition ${mode === m ? "bg-white text-[#7c3aed] shadow-sm" : "text-gray-600"}`}
                 >
                   {m === "draw" ? "Draw" : "Type"}
                 </button>
@@ -433,35 +436,35 @@ export default function SignClient({ variant = "client" }: { variant?: SignVaria
                   onPointerMove={onMove}
                   onPointerUp={() => (drawing.current = false)}
                   onPointerCancel={() => (drawing.current = false)}
-                  className="w-full h-44 rounded-lg bg-void border border-dashed border-amber/30 cursor-crosshair"
+                  className="w-full h-44 rounded-lg bg-white border border-dashed border-[#c4b5fd] cursor-crosshair"
                   style={{ touchAction: "none" }}
                 />
                 {!hasInk && (
-                  <p className="pointer-events-none absolute inset-0 flex items-center justify-center text-ghost text-sm">Sign with your finger</p>
+                  <p className="pointer-events-none absolute inset-0 flex items-center justify-center text-gray-400 text-sm">Sign with your finger</p>
                 )}
-                <div className="absolute left-4 right-4 bottom-9 border-b border-white/10 pointer-events-none" />
+                <div className="absolute left-4 right-4 bottom-9 border-b border-gray-200 pointer-events-none" />
                 {hasInk && (
-                  <button onClick={clearPad} className="absolute top-2 right-2 text-xs text-steel bg-obsidian/80 border border-white/10 rounded px-2 py-1">Clear</button>
+                  <button onClick={clearPad} className="absolute top-2 right-2 text-xs text-gray-600 bg-white border border-gray-300 rounded px-2 py-1">Clear</button>
                 )}
               </div>
             ) : (
-              <div className="h-44 rounded-lg bg-void border border-dashed border-amber/30 flex items-center justify-center px-4">
-                <span className={`${script.className} text-4xl sm:text-5xl text-ice truncate`}>{name.trim() || "Your name"}</span>
+              <div className="h-44 rounded-lg bg-white border border-dashed border-[#c4b5fd] flex items-center justify-center px-4">
+                <span className={`${script.className} text-4xl sm:text-5xl text-gray-900 truncate`}>{name.trim() || "Your name"}</span>
               </div>
             )}
 
             {status === "error" && (
-              <p className="text-sm text-red-300 mt-3">That didn’t go through. Check your connection and tap Sign again.</p>
+              <p className="text-sm text-red-600 mt-3">That didn’t go through. Check your connection and tap Sign again.</p>
             )}
 
             <button
               onClick={submit}
               disabled={!canSign || status === "sending"}
-              className="mt-4 w-full rounded-xl bg-amber-light text-void font-bold py-4 disabled:opacity-40 transition"
+              className="mt-4 w-full rounded-xl fl-grad-bg text-white font-bold py-4 disabled:opacity-40 transition"
             >
               {status === "sending" ? "Signing…" : variant === "witness" ? "Sign consent" : "Sign agreement"}
             </button>
-            <p className="text-[11px] text-ghost text-center mt-2.5 leading-relaxed">
+            <p className="text-[11px] text-gray-500 text-center mt-2.5 leading-relaxed">
               By tapping {variant === "witness" ? "Sign consent" : "Sign agreement"}, you agree to {v.agreement} above
               {variant === "witness" ? ", for the items you ticked" : ""}.
             </p>
