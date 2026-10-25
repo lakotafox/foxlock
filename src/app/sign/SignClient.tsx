@@ -1,13 +1,45 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Dancing_Script } from "next/font/google";
 import { CONTRACT_HTML, CONTRACT_VERSION } from "./contract";
+import { WITNESS_HTML, WITNESS_VERSION } from "../witness/contract";
 
 const script = Dancing_Script({ subsets: ["latin"], weight: "600" });
 
-type Details = { caseId: string; client: string; date: string; endDate: string };
+type Details = { caseId: string; client: string; clientLabel: string; date: string; endDate: string };
 type Status = "reading" | "signing" | "sending" | "signed" | "error";
+export type SignVariant = "client" | "witness";
+
+// Tick boxes in the witness form (generated into WITNESS_HTML), with the wording shown back after signing.
+const WITNESS_CHOICES: { name: string; kind: "checkbox" | "radio" | "text"; labels?: Record<string, string> }[] = [
+  { name: "share_messages", kind: "checkbox", labels: { yes: "Copies of the messages" } },
+  { name: "share_alerts", kind: "checkbox", labels: { yes: "Security alerts" } },
+  { name: "share_statement", kind: "checkbox", labels: { yes: "A short written statement" } },
+  { name: "share_contact", kind: "checkbox", labels: { yes: "Email address / username, to see how the sender found you" } },
+  { name: "account_check", kind: "radio", labels: { yes: "Account security check", no: "No account security check" } },
+  { name: "account_check_for", kind: "text" },
+  { name: "name_in_packet", kind: "radio", labels: { name: "Name may appear in the evidence package", label: "Referred to by a label, not by name" } },
+];
+
+const VARIANTS = {
+  client: {
+    html: CONTRACT_HTML,
+    version: CONTRACT_VERSION,
+    formName: "foxlock-signature",
+    eyebrow: "Client Authorization",
+    title: "Authorization and Scope Agreement",
+    agreement: "the FoxLock Security Client Authorization and Scope Agreement",
+  },
+  witness: {
+    html: WITNESS_HTML,
+    version: WITNESS_VERSION,
+    formName: "foxlock-witness",
+    eyebrow: "Witness Consent",
+    title: "Witness Evidence Consent",
+    agreement: "the FoxLock Security Witness Evidence Consent",
+  },
+} as const;
 
 const escapeHtml = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
@@ -19,8 +51,9 @@ function parseIsoDate(value: string | null): Date | null {
   return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : null;
 }
 
-// Personal details come from the URL fragment (#c=…&n=…&d=…&e=…), which browsers
-// never send to the server, so the client's name is never logged or stored by the site.
+// Personal details come from the URL fragment (#c=…&n=…&d=…&e=…, plus m=… naming the client
+// on a witness form), which browsers never send to the server, so names are never logged or
+// stored by the site.
 function readDetails(): Details {
   const p = new URLSearchParams(window.location.hash.slice(1));
   const today = new Date();
@@ -29,16 +62,59 @@ function readDetails(): Details {
   return {
     caseId: (p.get("c") || "").slice(0, 40),
     client: (p.get("n") || "").slice(0, 120),
+    clientLabel: (p.get("m") || "").slice(0, 60),
     date: longDate(start),
     endDate: longDate(end),
   };
 }
 
-function fillContract(d: Details) {
+function fillContract(variant: SignVariant, d: Details) {
+  if (variant === "witness") {
+    return WITNESS_HTML.replaceAll("{{CASE_ID}}", escapeHtml(d.caseId || "—"))
+      .replaceAll("{{DATE}}", escapeHtml(d.date))
+      .replaceAll("{{SIGNER}}", escapeHtml(d.client || "The person signing below"))
+      .replaceAll("{{CLIENT}}", escapeHtml(d.clientLabel || "our client"));
+  }
   return CONTRACT_HTML.replace("{{CASE_ID}}", escapeHtml(d.caseId || "—"))
     .replace("{{DATE}}", escapeHtml(d.date))
     .replace("{{CLIENT}}", escapeHtml(d.client || "The client signing below"))
     .replace("{{END_DATE}}", escapeHtml(d.endDate));
+}
+
+function readChoices(root: HTMLElement): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const c of WITNESS_CHOICES) {
+    if (c.kind === "checkbox") {
+      out[c.name] = root.querySelector<HTMLInputElement>(`input[name="${c.name}"]`)?.checked ? "yes" : "no";
+    } else if (c.kind === "radio") {
+      out[c.name] = root.querySelector<HTMLInputElement>(`input[name="${c.name}"]:checked`)?.value ?? "";
+    } else {
+      out[c.name] = (root.querySelector<HTMLInputElement>(`input[name="${c.name}"]`)?.value ?? "").trim().slice(0, 80);
+    }
+  }
+  return out;
+}
+
+function choiceSummary(choices: Record<string, string>): string[] {
+  const lines = WITNESS_CHOICES.flatMap((c) => (c.labels?.[choices[c.name]] ? [c.labels[choices[c.name]]] : []))
+    .filter((l) => !l.startsWith("No account"));
+  const i = lines.indexOf("Account security check");
+  if (i >= 0 && choices.account_check_for) lines[i] += ` (${choices.account_check_for})`;
+  return lines;
+}
+
+// The contract HTML is set imperatively, once per html value: with dangerouslySetInnerHTML,
+// page re-renders rewrote the article and cleared the witness's tick boxes.
+function Contract({ html, articleRef }: { html: string; articleRef: React.RefObject<HTMLElement | null> }) {
+  useLayoutEffect(() => {
+    if (articleRef.current) articleRef.current.innerHTML = html;
+  }, [html, articleRef]);
+  return (
+    <article
+      ref={articleRef}
+      className="contract paper rounded-xl border border-white/5 bg-obsidian/80 px-5 sm:px-8 py-4 glow-amber"
+    />
+  );
 }
 
 function LockMark({ size = 28 }: { size?: number }) {
@@ -55,8 +131,12 @@ function LockMark({ size = 28 }: { size?: number }) {
   );
 }
 
-export default function SignClient() {
+export default function SignClient({ variant = "client" }: { variant?: SignVariant }) {
+  const v = VARIANTS[variant];
   const [details, setDetails] = useState<Details | null>(null);
+  const [choices, setChoices] = useState<Record<string, string> | null>(null);
+  const [choiceError, setChoiceError] = useState<string | null>(null);
+  const articleRef = useRef<HTMLElement>(null);
   const [status, setStatus] = useState<Status>("reading");
   const [name, setName] = useState("");
   const [mode, setMode] = useState<"draw" | "type">("draw");
@@ -155,6 +235,22 @@ export default function SignClient() {
 
   const canSign = name.trim().length >= 2 && (mode === "type" || hasInk);
 
+  // The witness picks what they share before signing; the name choice in section 3 is required.
+  const openSheet = () => {
+    if (variant === "witness" && articleRef.current) {
+      const picked = readChoices(articleRef.current);
+      if (!picked.name_in_packet) {
+        setChoiceError("Please choose how your name should appear (section 3), then tap Sign here again.");
+        articleRef.current.querySelector('input[name="name_in_packet"]')?.closest("ul")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      setChoiceError(null);
+      setChoices(picked);
+    }
+    setStatus("signing");
+  };
+
   const submit = async () => {
     if (!canSign || !details) return;
     setStatus("sending");
@@ -162,15 +258,16 @@ export default function SignClient() {
       const png = await exportSignature();
       const now = new Date();
       const body = new URLSearchParams({
-        "form-name": "foxlock-signature",
+        "form-name": v.formName,
         "bot-field": "",
+        ...(variant === "witness" && choices ? choices : {}),
         case_id: details.caseId,
         signer_name: name.trim(),
         signature_method: mode,
         signature_png: png,
         signed_at: now.toISOString(),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        contract_version: CONTRACT_VERSION,
+        contract_version: v.version,
         user_agent: navigator.userAgent,
       });
       if (window.location.hostname === "localhost") {
@@ -183,6 +280,7 @@ export default function SignClient() {
         });
         if (!res.ok) throw new Error(`status ${res.status}`);
       }
+      articleRef.current?.querySelectorAll("input").forEach((el) => (el.disabled = true));
       setSignature(png);
       setSignedAt(now);
       setStatus("signed");
@@ -203,6 +301,11 @@ export default function SignClient() {
         .contract li { color: #cbd5e1; line-height: 1.65; margin: .45rem 0; }
         .contract li::marker { color: #d97706; }
         .contract strong { color: #f0f4f8; font-weight: 650; }
+        .contract ul:has(li.choice) { list-style: none; padding-left: 0; }
+        .contract li.choice label { display: flex; gap: .7rem; align-items: flex-start; padding: .7rem .8rem; border: 1px solid rgba(255,255,255,.08); border-radius: .6rem; cursor: pointer; }
+        .contract li.choice label:has(input:checked) { border-color: rgba(245,158,11,.55); background: rgba(245,158,11,.07); }
+        .contract li.choice input[type=checkbox], .contract li.choice input[type=radio] { accent-color: #f59e0b; width: 1.2rem; height: 1.2rem; margin-top: .2rem; flex-shrink: 0; }
+        .contract li.choice input[type=text] { background: #05070b; border: 1px solid rgba(255,255,255,.15); border-radius: .4rem; padding: .35rem .55rem; color: #f0f4f8; font-size: 1rem; width: 11rem; max-width: 100%; }
         @media print {
           body, .bg-void { background: #fff !important; }
           .no-print { display: none !important; }
@@ -228,19 +331,16 @@ export default function SignClient() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 pt-8 pb-40">
-        <p className="text-amber-light text-xs font-semibold uppercase tracking-[0.2em] mb-2">Client Authorization</p>
+        <p className="text-amber-light text-xs font-semibold uppercase tracking-[0.2em] mb-2">{v.eyebrow}</p>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight mb-2 print-ink">
-          Authorization and Scope Agreement
+          {v.title}
         </h1>
         <p className="text-steel text-sm mb-6 print-ink">
-          {details.client ? `Prepared for ${details.client}. ` : ""}Read it through, then tap <span className="text-amber-light font-semibold">Sign here</span> at the bottom.
+          {details.client ? `Prepared for ${details.client}. ` : ""}Read it through{variant === "witness" ? ", tick what you’re comfortable with" : ""}, then tap <span className="text-amber-light font-semibold">Sign here</span> at the bottom.
         </p>
         <div className="gradient-line mb-6" />
 
-        <article
-          className="contract paper rounded-xl border border-white/5 bg-obsidian/80 px-5 sm:px-8 py-4 glow-amber"
-          dangerouslySetInnerHTML={{ __html: fillContract(details) }}
-        />
+        <Contract html={fillContract(variant, details)} articleRef={articleRef} />
 
         {status === "signed" && signature && signedAt && (
           <section className="paper mt-8 rounded-xl border border-amber/30 bg-obsidian px-5 sm:px-8 py-6">
@@ -250,16 +350,24 @@ export default function SignClient() {
               </div>
               <div>
                 <p className="font-bold">Signed. Thank you{details.client ? `, ${details.client.split(" ")[0]}` : ""}.</p>
-                <p className="text-steel text-sm">FoxLock has received your signed agreement.</p>
+                <p className="text-steel text-sm">FoxLock has received your signed {variant === "witness" ? "consent" : "agreement"}.</p>
               </div>
             </div>
+            {variant === "witness" && choices && (
+              <div className="mb-4">
+                <p className="text-steel text-sm mb-1.5 print-ink">You agreed to</p>
+                <ul className="text-sm list-disc pl-5 space-y-1 print-ink">
+                  {choiceSummary(choices).map((line) => <li key={line}>{line}</li>)}
+                </ul>
+              </div>
+            )}
             <div className="rounded-lg bg-ice p-3 mb-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={signature} alt="Your signature" className="w-full max-w-sm mx-auto" />
             </div>
             <p className="text-sm print-ink"><span className="text-steel print-ink">Signed by</span> {name.trim()}</p>
             <p className="text-sm print-ink"><span className="text-steel print-ink">Date</span> {signedAt.toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" })}</p>
-            <p className="text-[11px] text-ghost font-mono mt-3 break-all print-ink">Agreement version {CONTRACT_VERSION.slice(0, 16)}</p>
+            <p className="text-[11px] text-ghost font-mono mt-3 break-all print-ink">{variant === "witness" ? "Consent" : "Agreement"} version {v.version.slice(0, 16)}</p>
             <button onClick={() => window.print()} className="no-print mt-5 w-full sm:w-auto rounded-lg border border-white/15 px-5 py-3 text-sm font-semibold hover:bg-white/5 transition">
               Save a copy
             </button>
@@ -270,8 +378,9 @@ export default function SignClient() {
       {status !== "signed" && (
         <div className="no-print fixed bottom-0 inset-x-0 z-40 border-t border-white/10 bg-void/90 backdrop-blur-md" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
           <div className="max-w-3xl mx-auto px-4 py-3">
+            {choiceError && <p className="text-sm text-amber-glow mb-2 text-center">{choiceError}</p>}
             <button
-              onClick={() => setStatus("signing")}
+              onClick={openSheet}
               className="w-full rounded-xl bg-amber-light text-void font-bold text-base py-4 shadow-[0_0_30px_rgba(245,158,11,0.35)] active:scale-[0.99] transition flex items-center justify-center gap-2"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
@@ -288,7 +397,7 @@ export default function SignClient() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
                 <LockMark size={24} />
-                <p className="font-bold">Sign agreement</p>
+                <p className="font-bold">{variant === "witness" ? "Sign consent" : "Sign agreement"}</p>
               </div>
               <button onClick={() => setStatus("reading")} disabled={status === "sending"} className="text-steel hover:text-white p-1" aria-label="Close">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
@@ -350,10 +459,11 @@ export default function SignClient() {
               disabled={!canSign || status === "sending"}
               className="mt-4 w-full rounded-xl bg-amber-light text-void font-bold py-4 disabled:opacity-40 transition"
             >
-              {status === "sending" ? "Signing…" : "Sign agreement"}
+              {status === "sending" ? "Signing…" : variant === "witness" ? "Sign consent" : "Sign agreement"}
             </button>
             <p className="text-[11px] text-ghost text-center mt-2.5 leading-relaxed">
-              By tapping Sign agreement, you agree to the FoxLock Security Client Authorization and Scope Agreement above.
+              By tapping {variant === "witness" ? "Sign consent" : "Sign agreement"}, you agree to {v.agreement} above
+              {variant === "witness" ? ", for the items you ticked" : ""}.
             </p>
           </div>
         </div>
