@@ -4,15 +4,18 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { Dancing_Script } from "next/font/google";
 import { CONTRACT_HTML, CONTRACT_VERSION } from "./contract";
 import { WITNESS_HTML, WITNESS_VERSION } from "../witness/contract";
+import { EMAIL_CONSENT_HTML, EMAIL_CONSENT_VERSION } from "../email-consent/contract";
 
 const script = Dancing_Script({ subsets: ["latin"], weight: "600" });
 
 type Details = { caseId: string; client: string; clientLabel: string; date: string; endDate: string };
 type Status = "reading" | "signing" | "sending" | "signed" | "error";
-export type SignVariant = "client" | "witness";
+export type SignVariant = "client" | "witness" | "email";
+
+type Choice = { name: string; kind: "checkbox" | "radio" | "text"; labels?: Record<string, string> };
 
 // Tick boxes in the witness form (generated into WITNESS_HTML), with the wording shown back after signing.
-const WITNESS_CHOICES: { name: string; kind: "checkbox" | "radio" | "text"; labels?: Record<string, string> }[] = [
+const WITNESS_CHOICES: Choice[] = [
   { name: "share_messages", kind: "checkbox", labels: { yes: "Copies of the messages" } },
   { name: "share_alerts", kind: "checkbox", labels: { yes: "Security alerts" } },
   { name: "share_statement", kind: "checkbox", labels: { yes: "A short written statement" } },
@@ -22,11 +25,22 @@ const WITNESS_CHOICES: { name: string; kind: "checkbox" | "radio" | "text"; labe
   { name: "name_in_packet", kind: "radio", labels: { name: "Name may appear in the evidence package", label: "Referred to by a label, not by name" } },
 ];
 
+// Inputs in the email collection consent (generated into EMAIL_CONSENT_HTML).
+const EMAIL_CHOICES: Choice[] = [
+  { name: "account_email", kind: "text" },
+  { name: "search_sender", kind: "checkbox", labels: { yes: "Search for emails from the sender's addresses" } },
+  { name: "search_mentions", kind: "checkbox", labels: { yes: "Search for emails that mention the client or the sender" } },
+  { name: "search_alerts", kind: "checkbox", labels: { yes: "Security alerts from the same time" } },
+  { name: "name_in_packet", kind: "radio", labels: { name: "Name may appear in the evidence package", label: "Referred to by a label, not by name" } },
+];
+
 const VARIANTS = {
   client: {
     html: CONTRACT_HTML,
     version: CONTRACT_VERSION,
     formName: "foxlock-signature",
+    choices: null,
+    nameSection: "",
     eyebrow: "Client Authorization",
     title: "Authorization and Scope Agreement",
     agreement: "the FoxLock Security Client Authorization and Scope Agreement",
@@ -35,9 +49,21 @@ const VARIANTS = {
     html: WITNESS_HTML,
     version: WITNESS_VERSION,
     formName: "foxlock-witness",
+    choices: WITNESS_CHOICES,
+    nameSection: "section 3",
     eyebrow: "Witness Consent",
     title: "Witness Evidence Consent",
     agreement: "the FoxLock Security Witness Evidence Consent",
+  },
+  email: {
+    html: EMAIL_CONSENT_HTML,
+    version: EMAIL_CONSENT_VERSION,
+    formName: "foxlock-email-consent",
+    choices: EMAIL_CHOICES,
+    nameSection: "section 4",
+    eyebrow: "Email Collection Consent",
+    title: "Email Collection Consent",
+    agreement: "the FoxLock Security Email Collection Consent",
   },
 } as const;
 
@@ -52,7 +78,7 @@ function parseIsoDate(value: string | null): Date | null {
 }
 
 // Personal details come from the URL fragment (#c=…&n=…&d=…&e=…, plus m=… naming the client
-// on a witness form), which browsers never send to the server, so names are never logged or
+// on a witness or email consent form), which browsers never send to the server, so names are never logged or
 // stored by the site.
 function readDetails(): Details {
   const p = new URLSearchParams(window.location.hash.slice(1));
@@ -69,8 +95,8 @@ function readDetails(): Details {
 }
 
 function fillContract(variant: SignVariant, d: Details) {
-  if (variant === "witness") {
-    return WITNESS_HTML.replaceAll("{{CASE_ID}}", escapeHtml(d.caseId || "—"))
+  if (variant !== "client") {
+    return VARIANTS[variant].html.replaceAll("{{CASE_ID}}", escapeHtml(d.caseId || "—"))
       .replaceAll("{{DATE}}", escapeHtml(d.date))
       .replaceAll("{{SIGNER}}", escapeHtml(d.client || "The person signing below"))
       .replaceAll("{{CLIENT}}", escapeHtml(d.clientLabel || "our client"));
@@ -81,9 +107,9 @@ function fillContract(variant: SignVariant, d: Details) {
     .replace("{{END_DATE}}", escapeHtml(d.endDate));
 }
 
-function readChoices(root: HTMLElement): Record<string, string> {
+function readChoices(root: HTMLElement, list: Choice[]): Record<string, string> {
   const out: Record<string, string> = {};
-  for (const c of WITNESS_CHOICES) {
+  for (const c of list) {
     if (c.kind === "checkbox") {
       out[c.name] = root.querySelector<HTMLInputElement>(`input[name="${c.name}"]`)?.checked ? "yes" : "no";
     } else if (c.kind === "radio") {
@@ -95,11 +121,12 @@ function readChoices(root: HTMLElement): Record<string, string> {
   return out;
 }
 
-function choiceSummary(choices: Record<string, string>): string[] {
-  const lines = WITNESS_CHOICES.flatMap((c) => (c.labels?.[choices[c.name]] ? [c.labels[choices[c.name]]] : []))
+function choiceSummary(list: Choice[], choices: Record<string, string>): string[] {
+  const lines = list.flatMap((c) => (c.labels?.[choices[c.name]] ? [c.labels[choices[c.name]]] : []))
     .filter((l) => !l.startsWith("No account"));
   const i = lines.indexOf("Account security check");
   if (i >= 0 && choices.account_check_for) lines[i] += ` (${choices.account_check_for})`;
+  if (choices.account_email) lines.unshift(`Email account: ${choices.account_email}`);
   return lines;
 }
 
@@ -133,6 +160,7 @@ function LockMark({ size = 28 }: { size?: number }) {
 
 export default function SignClient({ variant = "client" }: { variant?: SignVariant }) {
   const v = VARIANTS[variant];
+  const consent = v.choices !== null;
   const [details, setDetails] = useState<Details | null>(null);
   const [choices, setChoices] = useState<Record<string, string> | null>(null);
   const [choiceError, setChoiceError] = useState<string | null>(null);
@@ -235,12 +263,26 @@ export default function SignClient({ variant = "client" }: { variant?: SignVaria
 
   const canSign = name.trim().length >= 2 && (mode === "type" || hasInk);
 
-  // The witness picks what they share before signing; the name choice in section 3 is required.
+  // Consent signers pick what they share before signing; the name choice is required, and the
+  // email form also needs the account and at least one search.
   const openSheet = () => {
-    if (variant === "witness" && articleRef.current) {
-      const picked = readChoices(articleRef.current);
+    if (v.choices && articleRef.current) {
+      const picked = readChoices(articleRef.current, v.choices);
+      const ask = (msg: string, input: string) => {
+        setChoiceError(msg);
+        articleRef.current?.querySelector(`input[name="${input}"]`)?.closest("ul, p")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      };
+      if (variant === "email" && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(picked.account_email)) {
+        ask("Please enter the email account you will sign in to (section 1), then tap Sign here again.", "account_email");
+        return;
+      }
+      if (variant === "email" && ![picked.search_sender, picked.search_mentions, picked.search_alerts].includes("yes")) {
+        ask("Please tick at least one thing we may search for (section 2), then tap Sign here again.", "search_sender");
+        return;
+      }
       if (!picked.name_in_packet) {
-        setChoiceError("Please choose how your name should appear (section 3), then tap Sign here again.");
+        setChoiceError(`Please choose how your name should appear (${v.nameSection}), then tap Sign here again.`);
         articleRef.current.querySelector('input[name="name_in_packet"]')?.closest("ul")
           ?.scrollIntoView({ behavior: "smooth", block: "center" });
         return;
@@ -260,7 +302,7 @@ export default function SignClient({ variant = "client" }: { variant?: SignVaria
       const body = new URLSearchParams({
         "form-name": v.formName,
         "bot-field": "",
-        ...(variant === "witness" && choices ? choices : {}),
+        ...(consent && choices ? choices : {}),
         case_id: details.caseId,
         signer_name: name.trim(),
         signature_method: mode,
@@ -309,6 +351,7 @@ export default function SignClient({ variant = "client" }: { variant?: SignVaria
         .contract li.choice label:has(input:checked) { border-color: #a78bfa; background: #faf5ff; }
         .contract li.choice input[type=checkbox], .contract li.choice input[type=radio] { accent-color: #7c3aed; width: 1.2rem; height: 1.2rem; margin-top: .2rem; flex-shrink: 0; }
         .contract li.choice input[type=text] { background: #fff; border: 1px solid #d1d5db; border-radius: .4rem; padding: .35rem .55rem; color: #111827; font-size: 1rem; width: 11rem; max-width: 100%; }
+        .contract input[type=email] { display: block; margin-top: .4rem; background: #fff; border: 1px solid #d1d5db; border-radius: .4rem; padding: .55rem .7rem; color: #111827; font-size: 1rem; width: 100%; max-width: 24rem; }
         @media print {
           body { background: #fff !important; }
           .no-print { display: none !important; }
@@ -339,7 +382,7 @@ export default function SignClient({ variant = "client" }: { variant?: SignVaria
           {v.title}
         </h1>
         <p className="text-gray-600 text-sm mb-6 print-ink">
-          {details.client ? `Prepared for ${details.client}. ` : ""}Read it through{variant === "witness" ? ", tick what you’re comfortable with" : ""}, then tap <span className="text-[#db2777] font-semibold">Sign here</span> at the bottom.
+          {details.client ? `Prepared for ${details.client}. ` : ""}Read it through{consent ? ", tick what you’re comfortable with" : ""}, then tap <span className="text-[#db2777] font-semibold">Sign here</span> at the bottom.
         </p>
         <div className="h-0.5 rounded-full fl-grad-bg mb-6" />
 
@@ -353,14 +396,14 @@ export default function SignClient({ variant = "client" }: { variant?: SignVaria
               </div>
               <div>
                 <p className="font-bold">Signed. Thank you{details.client ? `, ${details.client.split(" ")[0]}` : ""}.</p>
-                <p className="text-gray-600 text-sm">FoxLock has received your signed {variant === "witness" ? "consent" : "agreement"}.</p>
+                <p className="text-gray-600 text-sm">FoxLock has received your signed {consent ? "consent" : "agreement"}.</p>
               </div>
             </div>
-            {variant === "witness" && choices && (
+            {v.choices && choices && (
               <div className="mb-4">
                 <p className="text-gray-600 text-sm mb-1.5 print-ink">You agreed to</p>
                 <ul className="text-sm list-disc pl-5 space-y-1 print-ink">
-                  {choiceSummary(choices).map((line) => <li key={line}>{line}</li>)}
+                  {choiceSummary(v.choices, choices).map((line) => <li key={line}>{line}</li>)}
                 </ul>
               </div>
             )}
@@ -370,7 +413,7 @@ export default function SignClient({ variant = "client" }: { variant?: SignVaria
             </div>
             <p className="text-sm print-ink"><span className="text-gray-600 print-ink">Signed by</span> {name.trim()}</p>
             <p className="text-sm print-ink"><span className="text-gray-600 print-ink">Date</span> {signedAt.toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" })}</p>
-            <p className="text-[11px] text-gray-400 font-mono mt-3 break-all print-ink">{variant === "witness" ? "Consent" : "Agreement"} version {v.version.slice(0, 16)}</p>
+            <p className="text-[11px] text-gray-400 font-mono mt-3 break-all print-ink">{consent ? "Consent" : "Agreement"} version {v.version.slice(0, 16)}</p>
             <button onClick={() => window.print()} className="no-print mt-5 w-full sm:w-auto rounded-lg border border-gray-300 px-5 py-3 text-sm font-semibold hover:bg-gray-50 transition">
               Save a copy
             </button>
@@ -400,7 +443,7 @@ export default function SignClient({ variant = "client" }: { variant?: SignVaria
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
                 <LockMark size={24} />
-                <p className="font-bold">{variant === "witness" ? "Sign consent" : "Sign agreement"}</p>
+                <p className="font-bold">{consent ? "Sign consent" : "Sign agreement"}</p>
               </div>
               <button onClick={() => setStatus("reading")} disabled={status === "sending"} className="text-gray-600 hover:text-gray-900 p-1" aria-label="Close">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
@@ -462,11 +505,11 @@ export default function SignClient({ variant = "client" }: { variant?: SignVaria
               disabled={!canSign || status === "sending"}
               className="mt-4 w-full rounded-xl fl-grad-bg text-white font-bold py-4 disabled:opacity-40 transition"
             >
-              {status === "sending" ? "Signing…" : variant === "witness" ? "Sign consent" : "Sign agreement"}
+              {status === "sending" ? "Signing…" : consent ? "Sign consent" : "Sign agreement"}
             </button>
             <p className="text-[11px] text-gray-500 text-center mt-2.5 leading-relaxed">
-              By tapping {variant === "witness" ? "Sign consent" : "Sign agreement"}, you agree to {v.agreement} above
-              {variant === "witness" ? ", for the items you ticked" : ""}.
+              By tapping {consent ? "Sign consent" : "Sign agreement"}, you agree to {v.agreement} above
+              {consent ? ", for the items you ticked" : ""}.
             </p>
           </div>
         </div>
